@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.beatific.daram.web.dao.JstatDao">
+
+    <select id="listJstatGraphByServer" parameterType="org.beatific.daram.web.vo.dao.JstatVo" resultType="org.beatific.daram.web.common.DbMap">
+        /* JstatDao.listJstatGraphByDesign */
+        SELECT SERVER
+             , S0
+             , S1
+             , E
+             , O
+             , P
+             , JSTAT_TIME
+             , YGC
+             , YGCT
+             , FGC
+             , FGCT
+             , TYGC
+             , TYGCT
+             , TFGC
+             , TFGCT
+             , TGCT
+          FROM (
+               SELECT SERVER
+                    , S0 
+                    , S1 
+                    , E 
+                    , O 
+                    , P 
+                    , JSTAT_TIME 
+                    , CASE WHEN YGC <![CDATA[<=]]> LAG(YGC) OVER(ORDER BY JSTAT_ID) 
+                           THEN 0
+                           ELSE YGC - LAG(YGC) OVER(ORDER BY JSTAT_ID)
+                           END YGC
+                    , CASE WHEN YGC <![CDATA[<=]]> LAG(YGC) OVER(ORDER BY JSTAT_ID) OR YGCT <![CDATA[<=]]> LAG(YGCT) OVER(ORDER BY JSTAT_ID)
+                           THEN 0
+                           ELSE (YGCT - LAG(YGCT) OVER(ORDER BY JSTAT_ID)) / (YGC - LAG(YGC) OVER(ORDER BY JSTAT_ID))
+                           END YGCT
+                    , CASE WHEN FGC <![CDATA[<=]]> LAG(FGC) OVER(ORDER BY JSTAT_ID) 
+                           THEN 0
+                           ELSE FGC - LAG(FGC) OVER(ORDER BY JSTAT_ID)
+                           END FGC
+                    , CASE WHEN FGC <![CDATA[<=]]> LAG(FGC) OVER(ORDER BY JSTAT_ID) OR FGCT <![CDATA[<=]]> LAG(FGCT) OVER(ORDER BY JSTAT_ID)
+                           THEN 0
+                           ELSE (FGCT - LAG(FGCT) OVER(ORDER BY JSTAT_ID)) / (FGC - LAG(FGC) OVER(ORDER BY JSTAT_ID))
+                           END FGCT
+                    , FGC TFGC 
+                    , FGCT TFGCT 
+                    , YGC TYGC 
+                    , YGCT TYGCT
+                    , GCT TGCT
+                    , JSTAT_ID
+                 FROM TB_JSTAT 
+                 <choose>
+	           <when test="fromTime == null or  fromTime  == '' or toTime == null or toTime == ''">
+	            WHERE JSTAT_TIME BETWEEN SYSTIMESTAMP - INTERVAL '1' hour AND SYSTIMESTAMP
+	           </when>
+	           <otherwise>
+	            WHERE JSTAT_TIME BETWEEN TO_DATE(#{fromTime}, 'YYYYMMDDHH24') AND TO_DATE(#{toTime}, 'YYYYMMDDHH24')
+	           </otherwise>
+           </choose>
+                  AND SERVER = #{server} 
+                )
+        WHERE YGC IS NOT NULL
+        ORDER BY JSTAT_ID
+    </select>
+    
+    <select id="selectJstatGraphByServer" parameterType="org.beatific.daram.web.vo.dao.JstatVo" resultType="org.beatific.daram.web.common.DbMap">
+        /* JstatDao.selectJstatGraphByServer */
+        SELECT SERVER
+             , S0
+             , S1
+             , E
+             , O
+             , P
+             , JSTAT_TIME
+             , YGC
+             , YGCT
+             , FGC
+             , FGCT
+             , TYGC
+             , TYGCT
+             , TFGC
+             , TFGCT
+             , TGCT, JSTAT_ID
+          FROM (
+               SELECT SERVER
+                    , S0 
+                    , S1 
+                    , E 
+                    , O 
+                    , P 
+                    , JSTAT_TIME 
+                    , CASE WHEN YGC <![CDATA[<=]]> LAG(YGC) OVER(ORDER BY JSTAT_ID) 
+                           THEN 0
+                           ELSE YGC - LAG(YGC) OVER(ORDER BY JSTAT_ID)
+                           END YGC
+                    , CASE WHEN YGC <![CDATA[<=]]> LAG(YGC) OVER(ORDER BY JSTAT_ID) OR YGCT <![CDATA[<=]]> LAG(YGCT) OVER(ORDER BY JSTAT_ID)
+                           THEN 0
+                           ELSE (YGCT - LAG(YGCT) OVER(ORDER BY JSTAT_ID)) / (YGC - LAG(YGC) OVER(ORDER BY JSTAT_ID))
+                           END YGCT
+                    , CASE WHEN FGC <![CDATA[<=]]> LAG(FGC) OVER(ORDER BY JSTAT_ID) 
+                           THEN 0
+                           ELSE FGC - LAG(FGC) OVER(ORDER BY JSTAT_ID)
+                           END FGC
+                    , CASE WHEN FGC <![CDATA[<=]]> LAG(FGC) OVER(ORDER BY JSTAT_ID) OR FGCT <![CDATA[<=]]> LAG(FGCT) OVER(ORDER BY JSTAT_ID)
+                           THEN 0
+                           ELSE (FGCT - LAG(FGCT) OVER(ORDER BY JSTAT_ID)) / (FGC - LAG(FGC) OVER(ORDER BY JSTAT_ID))
+                           END FGCT
+                    , FGC TFGC 
+                    , FGCT TFGCT 
+                    , YGC TYGC 
+                    , YGCT TYGCT
+                    , GCT TGCT
+                    , JSTAT_ID
+                 FROM TB_JSTAT 
+                WHERE SERVER = (SELECT SERVER FROM TB_SERVER WHERE SELECT_YN = 'Y' AND ROWNUM = 1)
+        ORDER BY JSTAT_ID DESC
+                )
+        WHERE YGC IS NOT NULL
+          AND ROWNUM = 1
+    </select>
+    
+    <select id="listServer" parameterType="org.beatific.daram.web.vo.dao.JstatVo" resultType="org.beatific.daram.web.common.DbMap">
+        /* JstatDao.listServer */
+        SELECT SERVER
+             , SELECT_YN
+          FROM TB_SERVER
+         ORDER BY SERVER
+    </select>
+    
+    <update id="updateServer" parameterType="org.beatific.daram.web.vo.dao.JstatVo" >
+        /* JstatDao.updateServer */
+        UPDATE TB_SERVER
+           SET SELECT_YN = DECODE(SERVER, #{server}, 'Y', 'N')
+    </update>
+    
+</mapper>
