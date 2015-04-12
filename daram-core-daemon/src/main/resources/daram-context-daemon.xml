@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<daram:daram xmlns:daram="http://www.beatific.org/schema/daram-0.1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<connection id="server" basePackage="org.beatific"  
+		url="service:jmx:rmi://localhost/jndi/rmi://localhost:9844/jmxrmi">
+		<mbean objectName="java.lang:type=Threading">
+			<attribute var="threadCount" name="ThreadCount"/>
+			<attribute var="peakCount" name="PeakThreadCount"/>
+			<attribute var="totalCount" name="TotalStartedThreadCount"/>
+		</mbean>
+		<mbean objectName="java.lang:type=ClassLoading">
+			<attribute var="classCount" name="LoadedClassCount"/>
+		</mbean>
+		<mbean objectName="java.lang:type=Memory">
+			<attribute var="memory" name="HeapMemoryUsage"/>
+		</mbean>
+		<mbean objectName="java.lang:type=OperatingSystem">
+			<attribute var="cpu" name="SystemCpuLoad"/>
+		</mbean>
+	</connection>
+	
+	<table id="memory">
+		<column name="used" value="[$[time]]Heap Size Current: $S{memory.get(used)}" />
+		<column name="max" value="[$[time]]Heap Max Size: $S{memory.get(max)}" />
+	</table>
+</daram:daram>
