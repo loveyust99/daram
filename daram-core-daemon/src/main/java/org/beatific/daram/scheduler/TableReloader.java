@@ -7,7 +7,7 @@ import org.beatific.daram.mbean.MBeanManager;
 import org.beatific.daram.table.Table;
 import org.beatific.ddirori.context.ApplicationContextUtils;
 
-@Schedule(fixed=1000, threads = 5)
+@Schedule(fixed=5000, threads = 1)
 public class TableReloader implements Runnable {
 
 	@Override

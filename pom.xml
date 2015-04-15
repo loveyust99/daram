@@ -35,9 +35,9 @@
 
 	<modules>
 		<module>daram-core</module>
-		<module>daram-core-spring</module>
+		<!-- <module>daram-core-spring</module>
 		<module>daram-web</module>
-        <module>daram-mbean</module>
+        <module>daram-mbean</module> -->
     <module>daram-core-daemon</module>
   </modules>
 

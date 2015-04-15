@@ -39,7 +39,15 @@ public class MBeanContainer extends BeanContainer {
 
 	@Override
 	public Object getBean(String beanName) {
-		return registry.get(beanName);
+		Object value = registry.get(beanName);
+		if(beanName.equals("totalCount")) {
+			if(value instanceof Integer) {
+				if( ((Integer)value) > 100 ) {
+					
+				}
+			}
+		}
+		return value;
 	}
 
 	@Override

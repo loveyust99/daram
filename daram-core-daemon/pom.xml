@@ -66,8 +66,9 @@
               <classpathPrefix>lib/</classpathPrefix>
             </manifest>
           </archive>
+          <finalName>myJar</finalName> 
         </configuration>
-      </plugin>
+      </plugin>   
     </plugins>
   </build>
 </project>
